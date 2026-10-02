@@ -1,0 +1,93 @@
+district,province,lat,lon,risk_pct,band,elevation_m,river_dist_km
+Dadu,Sindh,26.7303,67.7769,100.0,High,41.0,70.7
+Chitral,Khyber Pakhtunkhwa,35.8518,71.7864,100.0,High,1516.0,172.1
+Multan,Punjab,30.1968,71.4782,96.8,High,128.0,5.7
+Dera Ghazi Khan,Punjab,30.0459,70.6403,95.2,High,126.0,6.4
+Peshawar,Khyber Pakhtunkhwa,34.008,71.5785,88.5,High,340.0,2.8
+Sialkot,Punjab,32.4927,74.5313,87.2,High,257.0,3.0
+Sukkur,Sindh,27.7032,68.8589,86.5,High,75.0,0.8
+Karachi,Sindh,24.8608,67.0104,85.8,High,8.0,93.6
+Charsadda,Khyber Pakhtunkhwa,34.1482,71.7406,84.2,High,302.0,16.3
+Shangla,Khyber Pakhtunkhwa,34.9046,72.6425,84.0,High,1439.0,41.2
+Nowshera,Khyber Pakhtunkhwa,34.0158,71.9812,78.8,High,294.0,0.7
+Gujranwala,Punjab,32.1557,74.187,76.8,High,236.0,36.8
+Thatta,Sindh,24.7475,67.9235,76.0,High,17.0,0.7
+Kalat,Balochistan,29.0266,66.5936,72.8,High,2013.0,265.7
+Tank,Khyber Pakhtunkhwa,32.2171,70.3832,72.2,High,261.0,68.6
+Dera Ismail Khan,Khyber Pakhtunkhwa,31.8313,70.9017,71.2,High,179.0,4.6
+Larkana,Sindh,27.559,68.212,64.8,High,53.0,66.0
+Rajanpur,Punjab,29.1041,70.3297,63.7,High,97.0,27.3
+Badin,Sindh,24.656,68.837,62.0,High,15.0,92.2
+Gilgit,Gilgit-Baltistan,35.9187,74.3124,61.5,High,1466.0,125.6
+Muzaffargarh,Punjab,30.0726,71.1938,54.8,Moderate,121.0,32.8
+Mansehra,Khyber Pakhtunkhwa,34.3302,73.1968,49.8,Moderate,1075.0,25.2
+Mandi Bahauddin,Punjab,32.587,73.4912,49.8,Moderate,224.0,20.4
+Mirpur Khas,Sindh,25.5276,69.0126,49.0,Moderate,21.0,63.1
+Tharparkar,Sindh,24.737,69.7971,46.8,Moderate,39.0,158.9
+Swat,Khyber Pakhtunkhwa,34.7795,72.3627,46.0,Moderate,937.0,53.0
+Jacobabad,Sindh,28.2819,68.4376,44.8,Moderate,61.0,75.9
+Jhelum,Punjab,32.9345,73.731,39.5,Moderate,234.0,0.5
+Jaffarabad,Balochistan,28.3747,68.3503,35.0,Moderate,56.0,89.2
+Lasbela,Balochistan,25.8072,66.6219,20.8,Low,40.0,176.4
+Mardan,Khyber Pakhtunkhwa,34.1979,72.0496,20.2,Low,312.0,21.9
+Shikarpur,Sindh,27.9556,68.6382,18.2,Low,66.0,34.9
+Abbottabad,Khyber Pakhtunkhwa,34.1463,73.2117,15.0,Low,1243.0,32.8
+Nasirabad,Balochistan,28.5466,68.2231,14.8,Low,66.0,112.0
+Skardu,Gilgit-Baltistan,35.2979,75.6337,12.5,Low,2240.0,3.1
+Poonch,Azad Jammu & Kashmir,33.8578,73.7604,12.2,Low,1637.0,16.2
+Ziarat,Balochistan,30.3824,67.7256,9.5,Low,2436.0,279.5
+Swabi,Khyber Pakhtunkhwa,34.1202,72.4698,9.2,Low,338.0,21.3
+Mastung,Balochistan,29.7997,66.8455,8.2,Low,1681.0,304.2
+Islamabad,Islamabad Capital Territory,33.7215,73.0433,8.0,Low,583.0,52.2
+Mianwali,Punjab,32.5776,71.5285,6.5,Low,209.0,3.2
+Narowal,Punjab,32.102,74.873,5.8,Low,249.0,2.5
+Zhob,Balochistan,31.3408,69.4493,5.5,Low,1410.0,129.3
+Bahawalnagar,Punjab,29.9983,73.2527,5.2,Low,161.0,1.0
+Toba Tek Singh,Punjab,30.9713,72.4827,5.0,Low,162.0,32.2
+Bhakkar,Punjab,31.6269,71.0647,4.0,Low,173.0,25.1
+Kharan,Balochistan,28.5846,65.415,3.8,Low,721.0,351.5
+Khushab,Punjab,32.2967,72.3525,3.8,Low,188.0,0.4
+Khairpur,Sindh,27.5295,68.7592,3.2,Low,60.0,22.4
+Sibi,Balochistan,29.543,67.8773,3.2,Low,135.0,218.2
+Harnai,Balochistan,30.1008,67.9382,3.0,Low,902.0,254.9
+Diamer,Gilgit-Baltistan,35.4129,74.1041,2.8,Low,1266.0,68.9
+Lahore,Punjab,31.558,74.3507,2.8,Low,219.0,0.9
+Kashmore,Sindh,28.4326,69.5836,2.5,Low,78.0,11.9
+Rahim Yar Khan,Punjab,28.4199,70.3034,2.5,Low,85.0,59.1
+Kasur,Punjab,31.1187,74.4502,2.5,Low,211.0,5.2
+Dera Bugti,Balochistan,29.0362,69.1585,2.0,Low,477.0,88.3
+Shaheed Benazirabad,Sindh,26.2394,68.4037,2.0,Low,32.0,12.3
+Muzaffarabad,Azad Jammu & Kashmir,34.37,73.4708,1.8,Low,740.0,2.2
+Kohat,Khyber Pakhtunkhwa,33.582,71.4493,1.8,Low,504.0,42.8
+Khuzdar,Balochistan,27.8119,66.611,1.8,Low,1229.0,216.1
+Quetta,Balochistan,30.1841,67.0014,1.5,Low,1684.0,328.4
+Ghotki,Sindh,28.0044,69.3157,1.5,Low,70.0,55.5
+Sahiwal,Punjab,30.6659,73.1019,1.5,Low,173.0,27.7
+Chiniot,Punjab,31.7209,72.9784,1.2,Low,193.0,0.2
+Bannu,Khyber Pakhtunkhwa,32.9853,70.604,1.2,Low,380.0,98.3
+Hyderabad,Sindh,25.3969,68.3772,1.2,Low,29.0,2.3
+Layyah,Punjab,30.9613,70.939,1.2,Low,152.0,29.7
+Mirpur (AJK),Azad Jammu & Kashmir,28.0214,69.5491,1.0,Low,76.0,44.6
+Panjgur,Balochistan,26.9719,64.0946,1.0,Low,976.0,424.6
+Vehari,Punjab,30.0445,72.3556,1.0,Low,141.0,59.6
+Lodhran,Punjab,29.5339,71.6324,1.0,Low,118.0,24.1
+Jamshoro,Sindh,25.4361,68.2802,1.0,Low,29.0,12.7
+Kohlu,Balochistan,29.903,69.231,1.0,Low,1156.0,132.3
+Chakwal,Punjab,32.9329,72.8539,1.0,Low,528.0,63.7
+Attock,Punjab,33.7667,72.3598,1.0,Low,354.0,18.0
+Kotli,Azad Jammu & Kashmir,33.5184,73.9022,0.8,Low,611.0,42.0
+Khanewal,Punjab,30.3017,71.9321,0.8,Low,138.0,39.2
+Kech,Balochistan,26.0012,63.0485,0.5,Low,143.0,495.7
+Rawalpindi,Punjab,33.5973,73.0479,0.2,Low,507.0,55.8
+Chagai,Balochistan,28.8885,64.4062,0.2,Low,850.0,455.3
+Bahawalpur,Punjab,29.3978,71.6752,0.2,Low,121.0,17.8
+Sargodha,Punjab,32.0859,72.6742,0.2,Low,188.0,38.7
+Nankana Sahib,Punjab,31.4501,73.7065,0.2,Low,198.0,33.3
+Faisalabad,Punjab,31.4155,73.0897,0.0,Low,188.0,35.4
+Gujrat,Punjab,32.5742,74.0754,0.0,Low,238.0,0.6
+Sheikhupura,Punjab,32.2787,74.507,0.0,Low,240.0,24.6
+Hafizabad,Punjab,32.071,73.688,0.0,Low,213.0,17.8
+Pakpattan,Punjab,30.3431,73.3894,0.0,Low,190.0,20.8
+Okara,Punjab,30.8103,73.4515,0.0,Low,184.0,26.0
+Jhang,Punjab,33.6748,72.697,0.0,Low,463.0,47.3
+Gwadar,Balochistan,25.1216,62.3254,0.0,Low,6.0,535.3

@@ -41,6 +41,17 @@ import streamlit as st
 
 import advisory  # soil, crop advice, river levels, satellite (no streamlit dep)
 
+import dashboard   # district risk dashboard (no streamlit dep at import)
+import forecast    # 7-day rain forecast (no streamlit dep at import)
+import official    # NDMA/PDMA official alerts (no streamlit dep)
+import reports     # community flood reports via Telegram (no streamlit dep)
+import voice       # Urdu voice readout via gTTS (no streamlit dep at import)
+
+try:
+    import share_image  # PIL-based shareable result card
+except Exception:  # pillow missing -> share section hides itself
+    share_image = None
+
 # ======================================================================
 #  PAGE CONFIG
 # ======================================================================
@@ -144,6 +155,53 @@ STRINGS = {
             "Keep important documents in a waterproof bag.",
             "Follow only official PDMA / NDMA alerts — ignore rumors.",
         ],
+        "loading": "Loading...",
+        "dash_title": "🗺️ District Risk Dashboard",
+        "dash_sub": "Flood risk across {n} districts of Pakistan (2026 national model)",
+        "dash_unavailable": "District risk data unavailable right now.",
+        "dash_top10": "Top 10 riskiest districts",
+        "dash_note": ("District risk is computed with the 2026 national model at each "
+                      "district's centroid — indicative only, not a substitute for official alerts."),
+        "col_district": "District", "col_province": "Province",
+        "col_risk": "Risk %", "col_band": "Band",
+        "fc_title": "📊 7-Day Rain Forecast",
+        "fc_total": "Total expected rain", "fc_maxprob": "Highest rain probability",
+        "fc_heavy": "⚠️ Heavy rain expected in the next 7 days — stay alert.",
+        "fc_unavailable": "7-day forecast unavailable right now.",
+        "share_title": "🖼️ Share This Result",
+        "share_desc": "Download a shareable image of this result for WhatsApp / Facebook.",
+        "share_download": "⬇️ Download shareable image",
+        "voice_title": "🔊 Listen to Result (Urdu)",
+        "voice_play": "🔊 Play Urdu result",
+        "voice_unavailable": "Urdu voice unavailable right now.",
+        "alerts_title": "📲 Flood Alerts",
+        "alerts_desc": "Get a WhatsApp or Email alert when flood risk at your location reaches 60%+. Checked automatically every morning (06:00 PKT).",
+        "alerts_name": "Your name",
+        "alerts_contact": "WhatsApp number (with country code) or Email",
+        "alerts_contact_hint": "e.g. 923001234567 or you@example.com",
+        "alerts_subscribe": "🔔 Subscribe to alerts",
+        "alerts_ok": "Subscribed! You will be alerted when flood risk is high.",
+        "alerts_bad": "Please enter your name and a valid WhatsApp number or email.",
+        "alerts_note": "Alerts are free. WhatsApp delivery needs a one-time opt-in — see ALERTS_SETUP.md. You can unsubscribe anytime.",
+        "reports_title": "🗣️ Community Flood Reports",
+        "reports_desc": "See waterlogging or flooding in your area? Report it — it appears on the map for everyone.",
+        "reports_name": "Your name (or anonymous)",
+        "reports_severity": "Severity",
+        "reports_note_ph": "What do you see? e.g. knee-deep water on Main Road",
+        "reports_send": "📤 Send report",
+        "reports_sent": "Report posted ✅ — thank you!",
+        "reports_failed": "Could not post report: ",
+        "reports_recent": "Recent community reports",
+        "reports_none": "No community reports yet — be the first!",
+        "reports_setup": "Community reporting is not configured yet (needs TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID in Streamlit Secrets — see TELEGRAM_SETUP.md).",
+        "sev_low": "Low — waterlogging",
+        "sev_moderate": "Moderate — streets flooded",
+        "sev_severe": "Severe — houses/fields flooded",
+        "official_title": "🏛️ Official Alerts (NDMA / PDMA)",
+        "official_latest": "Latest NDMA Situation Report",
+        "official_sitreps": "Recent NDMA situation reports",
+        "official_links": "Official sources",
+        "official_unavailable": "Official feed temporarily unavailable — use the links below.",
     },
     "ur": {
         "tagline": "جی پی ایس پر مبنی سیلاب کے خطرے کی پیش گوئی اور لائیو ماحولیاتی نگرانی",
@@ -234,6 +292,53 @@ STRINGS = {
             "اہم کاغذات واٹر پروف تھیلے میں رکھیں۔",
             "صرف پی ڈی ایم اے / این ڈی ایم اے کی سرکاری ہدایات پر عمل کریں — افواہوں پر کان نہ دھریں۔",
         ],
+        "loading": "لوڈ ہو رہا ہے...",
+        "dash_title": "🗺️ ضلعی رسک ڈیش بورڈ",
+        "dash_sub": "پاکستان کے {n} اضلاع میں سیلاب کا خطرہ (2026 قومی ماڈل)",
+        "dash_unavailable": "ضلعی رسک کا ڈیٹا اس وقت دستیاب نہیں۔",
+        "dash_top10": "10 سب سے زیادہ خطرے والے اضلاع",
+        "dash_note": ("ضلعی خطرہ 2026 قومی ماڈل سے ہر ضلع کے مرکز پر نکالا گیا ہے — صرف اشارتی، "
+                      "سرکاری الرٹس کا متبادل نہیں۔"),
+        "col_district": "ضلع", "col_province": "صوبہ",
+        "col_risk": "خطرہ %", "col_band": "درجہ",
+        "fc_title": "📊 7 دن کی بارش کی پیش گوئی",
+        "fc_total": "متوقع کل بارش", "fc_maxprob": "بارش کا زیادہ سے زیادہ امکان",
+        "fc_heavy": "⚠️ اگلے 7 دنوں میں موسلا دھار بارش متوقع — ہوشیار رہیں۔",
+        "fc_unavailable": "7 دن کی پیش گوئی اس وقت دستیاب نہیں۔",
+        "share_title": "🖼️ یہ نتیجہ شیئر کریں",
+        "share_desc": "WhatsApp / Facebook کے لیے اس نتیجے کی شیئر کرنے والی تصویر ڈاؤن لوڈ کریں۔",
+        "share_download": "⬇️ شیئر تصویر ڈاؤن لوڈ کریں",
+        "voice_title": "🔊 نتیجہ سنیں (اردو)",
+        "voice_play": "🔊 اردو نتیجہ چلائیں",
+        "voice_unavailable": "اردو آواز اس وقت دستیاب نہیں۔",
+        "alerts_title": "📲 سیلاب الرٹس",
+        "alerts_desc": "جب آپ کے علاقے میں سیلاب کا خطرہ 60%+ ہو تو WhatsApp یا ای میل الرٹ حاصل کریں۔ روز صبح 06:00 بجے خودکار چیک ہوتا ہے۔",
+        "alerts_name": "آپ کا نام",
+        "alerts_contact": "WhatsApp نمبر (کنٹری کوڈ کے ساتھ) یا ای میل",
+        "alerts_contact_hint": "مثلاً 923001234567 یا you@example.com",
+        "alerts_subscribe": "🔔 الرٹ کے لیے سبسکرائب کریں",
+        "alerts_ok": "سبسکرائب ہو گیا! خطرہ بڑھنے پر آپ کو الرٹ ملے گا۔",
+        "alerts_bad": "براہ کرم نام اور درست WhatsApp نمبر یا ای میل درج کریں۔",
+        "alerts_note": "الرٹس مفت ہیں۔ WhatsApp کے لیے ایک بار opt-in ضروری ہے — ALERTS_SETUP.md دیکھیں۔",
+        "reports_title": "🗣️ عوامی سیلاب رپورٹس",
+        "reports_desc": "اپنے علاقے میں پانی جمع یا سیلاب دیکھا؟ رپورٹ کریں — سب کے نقشے پر نظر آئے گی۔",
+        "reports_name": "آپ کا نام (یا گمنام)",
+        "reports_severity": "شدت",
+        "reports_note_ph": "کیا دیکھا؟ مثلاً مین روڈ پر گھٹنوں تک پانی",
+        "reports_send": "📤 رپورٹ بھیجیں",
+        "reports_sent": "رپورٹ پوسٹ ہو گئی ✅ — شکریہ!",
+        "reports_failed": "رپورٹ نہیں بھیجی جا سکی: ",
+        "reports_recent": "حالیہ عوامی رپورٹس",
+        "reports_none": "ابھی کوئی عوامی رپورٹ نہیں — پہلے آپ بھیجیں!",
+        "reports_setup": "عوامی رپورٹنگ ابھی سیٹ اپ نہیں (Streamlit Secrets میں TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID درکار — TELEGRAM_SETUP.md دیکھیں)۔",
+        "sev_low": "کم — پانی جمع ہے",
+        "sev_moderate": "درمیانہ — گلیاں ڈوب گئیں",
+        "sev_severe": "شدید — گھر/کھیت ڈوب گئے",
+        "official_title": "🏛️ سرکاری الرٹس (NDMA / PDMA)",
+        "official_latest": "NDMA کی تازہ ترین صورتحال رپورٹ",
+        "official_sitreps": "NDMA کی حالیہ صورتحال رپورٹس",
+        "official_links": "سرکاری ذرائع",
+        "official_unavailable": "سرکاری فیڈ عارضی طور پر دستیاب نہیں — نیچے دیے گئے لنکس استعمال کریں۔",
     },
 }
 
@@ -784,6 +889,31 @@ def cached_rivers():
     return advisory.get_river_levels()
 
 
+@st.cache_data(ttl=6 * 3600, show_spinner=False)        # NDMA site: don't hammer
+def cached_official():
+    return official.get_official_alerts(limit=5, parse_latest_pdf=True)
+
+
+@st.cache_data(show_spinner=False)
+def cached_share_image(village, prob, band_en, date_str):
+    """Shareable PNG bytes for the download button; None when unavailable."""
+    if share_image is None:
+        return None
+    try:
+        return share_image.make_share_image(village, prob, band_en,
+                                            date_str).getvalue()
+    except Exception:
+        return None
+
+
+def get_secrets_dict():
+    """st.secrets as a plain dict, or None when no secrets are configured."""
+    try:
+        return dict(st.secrets)
+    except Exception:
+        return None
+
+
 def render_gps_component():
     """Render the browser geolocation component and stash coords in session state.
 
@@ -1118,11 +1248,57 @@ if result:
             fmap = build_map(result["lat"], result["lon"],
                              {"name": result["village"], "lat": result["vlat"],
                               "lon": result["vlon"]}, result["prob"], T)
+            # community report markers (stashed by the 🗣️ section below)
+            for _m in st.session_state.get("_report_markers", []):
+                try:
+                    import folium
+
+                    folium.Marker(
+                        [_m["lat"], _m["lon"]],
+                        popup=_m["popup_html"],
+                        icon=folium.Icon(color=_m["color"],
+                                         icon="exclamation-triangle", prefix="fa"),
+                    ).add_to(fmap)
+                except Exception:
+                    pass
             st_folium(fmap, width=700, height=380)
         except Exception as e:
             st.warning(f"Map unavailable: {e}")
     st.caption(f"{T['analysis_time']}: {result['time']}")
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # ---- Shareable image + Urdu voice ----
+    _band_en = "Low" if result["prob"] < 30 else ("Moderate" if result["prob"] < 60 else "High")
+    if share_image is not None:
+        st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["share_title"]}</h3>',
+                    unsafe_allow_html=True)
+        st.caption(T["share_desc"])
+        _png = cached_share_image(result["village"], result["prob"], _band_en,
+                                  result["time"])
+        if _png:
+            st.download_button(
+                label=T["share_download"],
+                data=_png,
+                file_name=f"floodguard_{result['vid']}.png",
+                mime="image/png",
+                key="share_dl",
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
+    try:
+        import gtts  # noqa: F401
+
+        st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["voice_title"]}</h3>',
+                    unsafe_allow_html=True)
+        if st.button(T["voice_play"], key="voice_btn"):
+            with st.spinner(T["loading"]):
+                _speech = voice.build_result_speech(result["village"],
+                                                    result["prob"], _band_en)
+                _audio = voice.speak_urdu(_speech)
+            if _audio is not None:
+                st.audio(_audio, format="audio/mp3")
+        st.markdown("</div>", unsafe_allow_html=True)
+    except Exception:
+        pass  # gTTS missing -> hide voice section silently
 
     # ---- Flood history ----
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["flood_history"]}</h3>',
@@ -1153,6 +1329,15 @@ if result:
     else:
         st.warning(T["weather_fail"])
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # ---- 7-Day Rain Forecast ----
+    try:
+        forecast.render_7day_forecast(result["lat"], result["lon"], T)
+    except Exception:
+        st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["fc_title"]}</h3>',
+                    unsafe_allow_html=True)
+        st.info(T["fc_unavailable"])
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # ---- Soil Fertility ----
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["soil_title"]}</h3>',
@@ -1223,6 +1408,70 @@ if result:
     st.caption("Source: NASA GIBS (free, no key)")
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # ---- Community Flood Reports ----
+    st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["reports_title"]}</h3>',
+                unsafe_allow_html=True)
+    st.caption(T["reports_desc"])
+    _secrets = get_secrets_dict()
+    if reports.is_configured(_secrets):
+        r1, r2 = st.columns(2)
+        rname = r1.text_input(T["reports_name"], value="", key="rp_name") or "anonymous"
+        sevkey = r2.selectbox(
+            T["reports_severity"], ["low", "moderate", "severe"],
+            format_func=lambda s: {"low": T["sev_low"],
+                                   "moderate": T["sev_moderate"],
+                                   "severe": T["sev_severe"]}[s],
+            key="rp_sev")
+        rnote = st.text_input(T["reports_note_ph"], key="rp_note",
+                              label_visibility="collapsed",
+                              placeholder=T["reports_note_ph"])
+        if st.button(T["reports_send"], key="rp_btn"):
+            ok, detail = reports.send_report(result["lat"], result["lon"],
+                                             result.get("village", ""), rname,
+                                             sevkey, rnote, _secrets)
+            (st.success if ok else st.warning)(
+                T["reports_sent"] if ok else T["reports_failed"] + detail)
+        st.subheader(T["reports_recent"])
+        reps, rst = reports.fetch_reports(limit=20, secrets=_secrets)
+        if rst == "ok" and reps:
+            for rp in reps:
+                st.markdown(f"• **{rp['village']}** ({rp['severity']}) — "
+                            f"{rp['note'] or '—'} <i>{rp['time']}</i>",
+                            unsafe_allow_html=True)
+        else:
+            st.caption(T["reports_none"])
+        # stash markers for the map overlay at the top of the results
+        st.session_state["_report_markers"] = reports.reports_to_markers(
+            reps if rst == "ok" else [])
+    else:
+        st.info(T["reports_setup"])
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # ---- Official Alerts (NDMA / PDMA) ----
+    st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["official_title"]}</h3>',
+                unsafe_allow_html=True)
+    try:
+        with st.spinner(T["loading"]):
+            _feed = cached_official()
+        _ls = _feed.get("latest_sitrep")
+        if _ls:
+            st.subheader(f'{T["official_latest"]} — No. {_ls.get("report_no", "")} '
+                         f'({_ls.get("date", "")})')
+            st.write(_ls.get("summary", ""))
+        if _feed.get("items"):
+            st.subheader(T["official_sitreps"])
+            for it in _feed["items"]:
+                st.markdown(f"• [{it['title']}]({it['url']}) — {it.get('date', '')}"
+                            + (f" — {it['summary']}" if it.get("summary") else ""))
+        if _feed.get("status") != "ok":
+            st.caption(_feed.get("notice") or T["official_unavailable"])
+        st.subheader(T["official_links"])
+        for _label, _url in _feed.get("links", []):
+            st.markdown(f"• [{_label}]({_url})")
+    except Exception:
+        st.info(T["official_unavailable"])
+    st.markdown("</div>", unsafe_allow_html=True)
+
     # ---- AQI ----
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["aqi"]}</h3>',
                 unsafe_allow_html=True)
@@ -1237,6 +1486,15 @@ if result:
         st.warning(T["aqi_fail"])
     st.markdown(f'<div class="fg-note">{T["weather_note"]}</div>', unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # ---- District Risk Dashboard ----
+    try:
+        dashboard.render_district_dashboard(T)
+    except Exception:
+        st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["dash_title"]}</h3>',
+                    unsafe_allow_html=True)
+        st.info(T["dash_unavailable"])
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # ---- Compare ----
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["compare"]}</h3>',
