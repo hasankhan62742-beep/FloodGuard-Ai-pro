@@ -1,0 +1,80 @@
+event_name,year,latitude,longitude,source
+EM-DAT flood 2006 — Riverine flood,2006,33.06,69.95,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2006 — Riverine flood,2006,34.61,73.2,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2006 — Riverine flood,2006,20.19,73.82,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2006 — Riverine flood,2006,25.03,67.12,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2006 — Flash flood,2006,32.89,73.88,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2007 — Flash flood,2007,34.98,72.23,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2007 — Riverine flood,2007,34.27,71.87,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2007 — Riverine flood,2007,35.95,74.34,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2008 — Riverine flood,2008,33.92,71.7,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2008 — Riverine flood,2008,30.74,72.63,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2009 — Riverine flood,2009,24.99,67.19,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2009 — Flash flood,2009,33.92,72.25,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2010 — Riverine flood,2010,36.03,72.08,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2010 — Flash flood,2010,30.51,66.95,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2011 — Riverine flood,2011,25.012,69.07,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2012 — Riverine flood,2012,28.04,68.77,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2012 — Riverine flood,2012,35.03,73.52,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2013 — Riverine flood,2013,28.7404,69.11,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2015 — Flash flood,2015,33.5131,71.89,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2015 — Flood (General),2015,35.0129,72.84,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2015 — Flood (General),2015,34.3432,72.27,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2016 — Flash flood,2016,33.054,71.779,EM-DAT (DFO/EM-DAT merged mirror)
+EM-DAT flood 2016 — Flash flood,2016,36.104,72.793,EM-DAT (DFO/EM-DAT merged mirror)
+2010 Indus super-flood — Nowshera,2010,34.01,71.98,"curated (documented event, district centroid)"
+2010 Indus super-flood — Charsadda,2010,34.15,71.73,"curated (documented event, district centroid)"
+2010 Indus super-flood — Swat (Kalam),2010,35.48,72.57,"curated (documented event, district centroid)"
+2010 Indus super-flood — D.I. Khan,2010,31.83,70.91,"curated (documented event, district centroid)"
+2010 Indus super-flood — Muzaffargarh,2010,30.07,71.19,"curated (documented event, district centroid)"
+2010 Indus super-flood — D.G. Khan,2010,30.05,70.63,"curated (documented event, district centroid)"
+2010 Indus super-flood — Rajanpur,2010,29.1,70.32,"curated (documented event, district centroid)"
+2010 Indus super-flood — Sukkur,2010,27.71,68.86,"curated (documented event, district centroid)"
+2010 Indus super-flood — Jacobabad,2010,28.28,68.43,"curated (documented event, district centroid)"
+2010 Indus super-flood — Dadu,2010,26.73,67.78,"curated (documented event, district centroid)"
+2010 Indus super-flood — Thatta,2010,24.75,67.93,"curated (documented event, district centroid)"
+2010 Indus super-flood — Larkana,2010,27.56,68.21,"curated (documented event, district centroid)"
+2011 Sindh floods — Badin,2011,24.66,68.84,"curated (documented event, district centroid)"
+2011 Sindh floods — Tharparkar (Mithi),2011,24.74,69.8,"curated (documented event, district centroid)"
+2011 Sindh floods — Mirpur Khas,2011,25.53,69.01,"curated (documented event, district centroid)"
+2011 Sindh floods — Sanghar,2011,26.05,68.95,"curated (documented event, district centroid)"
+2011 Sindh floods — Umerkot,2011,25.37,69.74,"curated (documented event, district centroid)"
+2012 monsoon floods — Rajanpur,2012,29.1,70.32,"curated (documented event, district centroid)"
+2012 monsoon floods — D.G. Khan,2012,30.05,70.63,"curated (documented event, district centroid)"
+2012 monsoon floods — Jacobabad,2012,28.28,68.43,"curated (documented event, district centroid)"
+2012 monsoon floods — Jaffarabad,2012,28.37,68.28,"curated (documented event, district centroid)"
+2012 monsoon floods — Naseerabad,2012,28.55,68.03,"curated (documented event, district centroid)"
+2014 Punjab floods — Jhang,2014,31.27,72.33,"curated (documented event, district centroid)"
+2014 Punjab floods — Multan,2014,30.16,71.52,"curated (documented event, district centroid)"
+2014 Punjab floods — Sialkot,2014,32.5,74.53,"curated (documented event, district centroid)"
+2014 Punjab floods — Gujranwala,2014,32.19,74.19,"curated (documented event, district centroid)"
+2014 Punjab floods — Mandi Bahauddin,2014,32.59,73.49,"curated (documented event, district centroid)"
+2015 floods — Chitral,2015,35.85,71.79,"curated (documented event, district centroid)"
+2020 Karachi urban floods,2020,24.86,67.01,"curated (documented event, district centroid)"
+2022 super-flood — Dadu (Mehar),2022,27.18,67.82,"curated (documented event, district centroid)"
+2022 super-flood — Khairpur Nathan Shah,2022,27.12,67.73,"curated (documented event, district centroid)"
+2022 super-flood — Larkana,2022,27.56,68.21,"curated (documented event, district centroid)"
+2022 super-flood — Sukkur,2022,27.71,68.86,"curated (documented event, district centroid)"
+2022 super-flood — Jaffarabad,2022,28.28,68.26,"curated (documented event, district centroid)"
+2022 super-flood — Naseerabad,2022,28.55,68.03,"curated (documented event, district centroid)"
+2022 super-flood — Lasbela,2022,25.95,66.42,"curated (documented event, district centroid)"
+2022 super-flood — Kalat,2022,29.03,66.59,"curated (documented event, district centroid)"
+2022 super-flood — Rajanpur,2022,29.1,70.32,"curated (documented event, district centroid)"
+2022 super-flood — D.G. Khan,2022,30.05,70.63,"curated (documented event, district centroid)"
+2022 super-flood — Taunsa,2022,30.71,70.65,"curated (documented event, district centroid)"
+2022 super-flood — Muzaffargarh,2022,30.07,71.19,"curated (documented event, district centroid)"
+2022 super-flood — Nowshera,2022,34.01,71.98,"curated (documented event, district centroid)"
+2022 super-flood — Charsadda,2022,34.15,71.73,"curated (documented event, district centroid)"
+2022 super-flood — Swat (Mingora),2022,34.77,72.36,"curated (documented event, district centroid)"
+2022 super-flood — D.I. Khan,2022,31.83,70.91,"curated (documented event, district centroid)"
+2022 super-flood — Tank,2022,32.22,70.38,"curated (documented event, district centroid)"
+2025 KP flash floods — Buner (Daggar),2025,34.51,72.62,"curated (documented event, district centroid)"
+2025 KP flash floods — Bajaur,2025,34.73,71.51,"curated (documented event, district centroid)"
+2025 KP flash floods — Battagram,2025,34.68,73.03,"curated (documented event, district centroid)"
+2025 KP flash floods — Mansehra,2025,34.33,73.2,"curated (documented event, district centroid)"
+2025 KP flash floods — Shangla,2025,34.9,72.65,"curated (documented event, district centroid)"
+2025 KP flash floods — Swat,2025,34.77,72.36,"curated (documented event, district centroid)"
+2025 GB floods — Gilgit,2025,35.92,74.31,"curated (documented event, district centroid)"
+2025 Punjab riverine floods — Sialkot,2025,32.5,74.53,"curated (documented event, district centroid)"
+2025 Punjab riverine floods — Jhang,2025,31.27,72.33,"curated (documented event, district centroid)"
+2025 urban flooding — Karachi,2025,24.86,67.01,"curated (documented event, district centroid)"
