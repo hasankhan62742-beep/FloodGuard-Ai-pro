@@ -59,8 +59,8 @@ PKT = timezone(timedelta(hours=5))
 STRINGS = {
     "en": {
         "tagline": "GPS-based Flood Risk & Live Environmental Monitoring",
-        "desc": ("The current ML prediction is based on the 2022 observed-flood model. "
-                 "Live weather and air quality are shown as supplementary context only."),
+        "desc": ("Flood risk predicted by the 2026 national model — trained on 79 historical "
+                 "Pakistan flood events (2006–2025). Live weather, rivers and air quality shown as supplementary context."),
         "demo_banner": "⚠️ Demo data — connect your trained model and 23,774-village dataset to go live.",
         "auto_banner": "ℹ️ Auto data active — {n} Pakistan settlements loaded, elevation fetched live per query. Predictions use your trained model.",
         "nomodel_banner": "⚠️ Trained model file not found — locations are real but probabilities are demo. Upload floodguard_final_static_model_2022.joblib for real predictions.",
@@ -90,9 +90,14 @@ STRINGS = {
         "temp": "Temperature", "humidity": "Humidity", "rain": "Rain",
         "wind": "Wind", "rain24": "Next 24h Rain", "rain24prob": "Next 24h Rain Prob.",
         "wind72": "72h Max Wind", "gust72": "72h Max Gust",
-        "weather_note": ("Important: live weather and AQI are NOT inputs to the current ML model. "
-                         "They are shown as live environmental information. The flood probability "
-                         "comes from the static 2022 observed-flood Random Forest model."),
+        "live_now": "🔴 LIVE RIGHT NOW",
+        "rain_now": "Raining now", "rain_next3h": "Next 3h rain",
+        "updated": "Updated",
+        "auto_refresh": "🔄 Auto-refresh live data (5 min)",
+        "live_hint": "Flood susceptibility changes slowly; live rain, rivers and weather refresh continuously.",
+        "weather_note": ("Live weather and AQI are shown as live environmental information. "
+                         "The flood probability comes from the 2026 national Random Forest model "
+                         "(79 historical Pakistan flood events, 2006–2025; 98.5% holdout accuracy)."),
         "aqi": "🌫️ Live Air Quality",
         "us_aqi": "US AQI", "eu_aqi": "European AQI",
         "aqi_good": "Good", "aqi_moderate": "Moderate", "aqi_usg": "Unhealthy for Sensitive Groups",
@@ -111,7 +116,7 @@ STRINGS = {
         "download": "📥 Download Report (PDF)",
         "disclaimer": "⚠️ Not for emergency use — always follow official PDMA / NDMA alerts.",
         "analysis_time": "Analysis generated",
-        "footer": "FloodGuard AI | Production dataset: 23,774 villages | Static observed-flood model: 2022 | Live weather/AQI: Open-Meteo",
+        "footer": "FloodGuard AI | 2026 national model: 79 flood events (2006–2025) | 28,916 villages | Live weather/AQI: Open-Meteo",
         "map_title": "🗺️ Risk Map",
         "flood_history": "📜 Flood History Near This Location",
         "no_nearby_events": "No recorded flood events within 25 km in our archive.",
@@ -142,8 +147,8 @@ STRINGS = {
     },
     "ur": {
         "tagline": "جی پی ایس پر مبنی سیلاب کے خطرے کی پیش گوئی اور لائیو ماحولیاتی نگرانی",
-        "desc": ("موجودہ ایم ایل پیش گوئی 2022 کے مشاہدہ شدہ سیلاب ماڈل پر مبنی ہے۔ "
-                 "لائیو موسم اور ہوا کا معیار صرف اضافی معلومات کے طور پر دکھایا جاتا ہے۔"),
+        "desc": ("سیلاب کے خطرے کی پیش گوئی 2026 کے قومی ماڈل سے ہوتی ہے — 79 تاریخی پاکستانی سیلاب "
+                 "واقعات (2006–2025) پر تربیت یافتہ۔ لائیو موسم، دریا اور ہوا کا معیار اضافی معلومات کے طور پر دکھائے جاتے ہیں۔"),
         "demo_banner": "⚠️ ڈیمو ڈیٹا — لائیو کرنے کے لیے اپنا تربیت یافتہ ماڈل اور 23,774 دیہات کا ڈیٹا سیٹ منسلک کریں۔",
         "auto_banner": "ℹ️ خودکار ڈیٹا فعال — {n} پاکستانی بستیاں لوڈ ہو گئیں، بلندی ہر سوال پر لائیو حاصل کی جاتی ہے۔ پیش گوئیاں آپ کے تربیت یافتہ ماڈل سے ہوں گی۔",
         "nomodel_banner": "⚠️ تربیت یافتہ ماڈل فائل نہیں ملی — مقامات اصل ہیں لیکن امکانات ڈیمو ہیں۔ اصل پیش گوئیوں کے لیے floodguard_final_static_model_2022.joblib اپ لوڈ کریں۔",
@@ -174,9 +179,14 @@ STRINGS = {
         "wind": "ہوا کی رفتار", "rain24": "اگلے 24 گھنٹے میں بارش",
         "rain24prob": "اگلے 24 گھنٹے میں بارش کا امکان",
         "wind72": "72 گھنٹے میں زیادہ سے زیادہ ہوا", "gust72": "72 گھنٹے میں زیادہ سے زیادہ جھونکا",
-        "weather_note": ("اہم: لائیو موسم اور ہوا کا معیار موجودہ ایم ایل ماڈل کا ان پٹ نہیں ہیں۔ "
-                         "یہ صرف لائیو ماحولیاتی معلومات ہیں۔ سیلاب کا امکان 2022 کے جامد "
-                         "مشاہدہ شدہ سیلاب رینڈم فاریسٹ ماڈل سے حاصل ہوتا ہے۔"),
+        "live_now": "🔴 ابھی لائیو",
+        "rain_now": "اس وقت بارش", "rain_next3h": "اگلے 3 گھنٹے میں بارش",
+        "updated": "اپ ڈیٹ ہوا",
+        "auto_refresh": "🔄 لائیو ڈیٹا خودکار ریفریش (5 منٹ)",
+        "live_hint": "سیلاب کا خطرہ آہستہ بدلتا ہے؛ لائیو بارش، دریا اور موسم مسلسل اپ ڈیٹ ہوتے ہیں۔",
+        "weather_note": ("لائیو موسم اور ہوا کا معیار لائیو ماحولیاتی معلومات کے طور پر دکھائے جاتے ہیں۔ "
+                         "سیلاب کا امکان 2026 کے قومی رینڈم فاریسٹ ماڈل سے حاصل ہوتا ہے "
+                         "(79 تاریخی پاکستانی سیلاب واقعات، 2006–2025؛ 98.5% درستگی)."),
         "aqi": "🌫️ لائیو ہوا کا معیار",
         "us_aqi": "امریکی اے کیو آئی", "eu_aqi": "یورپی اے کیو آئی",
         "aqi_good": "اچھا", "aqi_moderate": "درمیانہ",
@@ -196,7 +206,7 @@ STRINGS = {
         "download": "📥 رپورٹ ڈاؤن لوڈ کریں (PDF)",
         "disclaimer": "⚠️ ایمرجنسی کے لیے استعمال نہ کریں — ہمیشہ پی ڈی ایم اے / این ڈی ایم اے کی سرکاری ہدایات پر عمل کریں۔",
         "analysis_time": "تجزیہ کا وقت",
-        "footer": "فلڈ گارڈ اے آئی | ڈیٹا سیٹ: 23,774 دیہات | جامد مشاہدہ شدہ سیلاب ماڈل: 2022 | لائیو موسم/ہوا: Open-Meteo",
+        "footer": "فلڈ گارڈ اے آئی | 2026 قومی ماڈل: 79 سیلاب واقعات (2006–2025) | 28,916 بستیاں | لائیو موسم/ہوا: Open-Meteo",
         "map_title": "🗺️ رسک کا نقشہ",
         "flood_history": "📜 اس مقام کے قریب ماضی کے سیلاب",
         "no_nearby_events": "ہمارے ریکارڈ میں 25 کلومیٹر کے اندر کوئی سیلاب درج نہیں۔",
@@ -638,6 +648,7 @@ def parse_weather(data):
         "wind": cur.get("wind_speed_10m"),
         "rain24": None, "rain24prob": None,
         "wind72": None, "gust72": None,
+        "rain_next3h": None,
     }
     try:
         cur_t = cur.get("time", "")
@@ -651,6 +662,7 @@ def parse_weather(data):
         gust = hourly.get("wind_gusts_10m", [])[:72]
         out["rain24"] = round(sum(x for x in precip if x is not None), 1)
         out["rain24prob"] = max((x for x in prob if x is not None), default=None)
+        out["rain_next3h"] = round(sum(x for x in precip[:3] if x is not None), 1)
         out["wind72"] = round(max((x for x in wind if x is not None), default=0), 1)
         out["gust72"] = round(max((x for x in gust if x is not None), default=0), 1)
     except Exception:
@@ -772,22 +784,33 @@ def cached_rivers():
     return advisory.get_river_levels()
 
 
-def try_gps():
-    """Best-effort GPS: uses streamlit_geolocation if installed, else None.
+def render_gps_component():
+    """Render the browser geolocation component and stash coords in session state.
 
-    Never raises — the UI shows a graceful fallback message instead.
+    Returns True when a fresh browser location is available. Never raises —
+    the UI shows a graceful fallback message instead. Requires the
+    `streamlit-geolocation` package (see requirements.txt).
     """
     try:
         from streamlit_geolocation import streamlit_geolocation
 
         loc = streamlit_geolocation()
         if isinstance(loc, dict):
-            lat = loc.get("latitude") or (loc.get("coords") or {}).get("latitude")
-            lon = loc.get("longitude") or (loc.get("coords") or {}).get("longitude")
+            lat = loc.get("latitude")
+            lon = loc.get("longitude")
             if lat is not None and lon is not None:
-                return float(lat), float(lon)
+                st.session_state["gps_lat"] = float(lat)
+                st.session_state["gps_lon"] = float(lon)
+                return True
     except Exception:
         pass
+    return False
+
+
+def try_gps():
+    """Kept for compatibility — prefer render_gps_component()."""
+    if st.session_state.get("gps_lat") is not None:
+        return st.session_state["gps_lat"], st.session_state.get("gps_lon")
     return None, None
 
 
@@ -926,6 +949,18 @@ with st.sidebar:
     st.session_state["theme"] = theme_choice
 
     st.markdown("---")
+    auto_rf = st.toggle(T["auto_refresh"],
+                        value=st.session_state.get("auto_refresh", False),
+                        key="auto_refresh_tgl")
+    st.session_state["auto_refresh"] = auto_rf
+    if auto_rf:
+        try:
+            from streamlit_autorefresh import st_autorefresh
+            st_autorefresh(interval=5 * 60 * 1000, key="live_autorefresh")
+        except Exception:
+            pass
+
+    st.markdown("---")
     st.subheader(T["history"])
     if st.session_state["history"]:
         for h in reversed(st.session_state["history"][-8:]):
@@ -983,11 +1018,15 @@ with c2:
 with c3:
     st.write("")
     st.write("")
+    gps_ready = render_gps_component()
     if st.button(T["gps"], key="gps_btn"):
         glat, glon = try_gps()
-        if glat is not None:
+        if glat is not None and glon is not None:
             st.session_state["lat"], st.session_state["lon"] = round(glat, 4), round(glon, 4)
             st.success(T["gps_ok"])
+            st.rerun()
+        elif gps_ready:
+            st.info(T["gps_ok"])
             st.rerun()
         else:
             st.warning(T["gps_fail"])
@@ -1041,6 +1080,21 @@ result = st.session_state["result"]
 #  RESULTS
 # ======================================================================
 if result:
+    # ---- 🔴 LIVE NOW strip ----
+    _w = result.get("weather") or {}
+    _rain_now = _w.get("rain")
+    _rain3 = _w.get("rain_next3h")
+    if _rain_now is not None or _rain3 is not None:
+        st.markdown(f'<div class="fg-card" style="border-left:5px solid #e74c3c">'
+                    f'<h3 style="margin-top:0">{T["live_now"]}</h3>',
+                    unsafe_allow_html=True)
+        l1, l2, l3 = st.columns(3)
+        l1.metric(T["rain_now"], f"{_rain_now} mm" if _rain_now is not None else "–")
+        l2.metric(T["rain_next3h"], f"{_rain3} mm" if _rain3 is not None else "–")
+        l3.metric(T["updated"], result["time"])
+        st.caption(T["live_hint"])
+        st.markdown("</div>", unsafe_allow_html=True)
+
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["risk_model"]}</h3>',
                 unsafe_allow_html=True)
     i1, i2, i3, i4 = st.columns(4)
