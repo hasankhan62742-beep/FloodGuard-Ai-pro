@@ -39,7 +39,7 @@ _STREAMLIT_JS = """\
       },
     },
     setComponentReady: function () {
-      sendBackMsg("streamlit:componentReady", { apiVersion: 2 });
+      sendBackMsg("streamlit:componentReady", { apiVersion: 1 });
     },
     setFrameHeight: function (h) {
       sendBackMsg("streamlit:setFrameHeight", {
