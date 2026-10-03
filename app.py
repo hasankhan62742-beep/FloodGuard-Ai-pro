@@ -1000,11 +1000,10 @@ def get_secrets_dict():
 
 
 def apply_gps_coords(glat, glon, T):
-    """Apply a fresh coordinate fix: fill the inputs, reverse-geocode the
-    exact place name, and announce it. Guarded by session_state['gps_applied']
-    so the same fix is never processed twice."""
+    """Apply a coordinate fix: fill the inputs, reverse-geocode the exact
+    place name, and announce it. Callers guarantee this runs once per fix
+    (component path uses fresh-fix detection; map path uses gps_tapped)."""
     glat, glon = round(float(glat), 4), round(float(glon), 4)
-    st.session_state["gps_applied"] = (glat, glon)
     st.session_state["lat"], st.session_state["lon"] = glat, glon
     with st.spinner(T["loading"]):
         _place = geocode.reverse_geocode(glat, glon)
@@ -1020,12 +1019,16 @@ def apply_gps_coords(glat, glon, T):
 
 
 def render_gps_component():
-    """Render the browser geolocation component and stash coords in session state.
+    """Render the browser geolocation component.
+
+    Returns True ONLY when a NEW fix arrived (coords differ from the last
+    seen fix) — this is what prevents the infinite rerun/geocode loop.
+    Stashes coords + accuracy in session state for try_gps().
 
     NOTE: streamlit-geolocation renders its OWN 🎯 button — the browser
     permission prompt fires only when THAT button is clicked, never on page
     load and never from our own buttons. So this component just needs to be
-    visible with a clear label; apply_gps_coords() picks up fresh fixes.
+    visible with a clear label; the caller applies fresh fixes.
     Requires the `streamlit-geolocation` package (see requirements.txt).
     """
     try:
@@ -1038,6 +1041,10 @@ def render_gps_component():
             lat = coords.get("latitude")
             lon = coords.get("longitude")
             if lat is not None and lon is not None:
+                _key = (round(float(lat), 4), round(float(lon), 4))
+                if st.session_state.get("gps_seen") == _key:
+                    return False  # same fix as before — not new
+                st.session_state["gps_seen"] = _key
                 st.session_state["gps_lat"] = float(lat)
                 st.session_state["gps_lon"] = float(lon)
                 acc = coords.get("accuracy")
@@ -1266,13 +1273,12 @@ with c3:
     # fires only from that button, so we label it clearly and auto-apply
     # every fresh fix via apply_gps_coords().
     st.caption(T["gps_tap_hint"])
-    render_gps_component()
-    _glat, _glon = try_gps()
-    _applied = st.session_state.get("gps_applied")
-    if (_glat is not None and _glon is not None
-            and tuple(_applied or (None, None)) != (_glat, _glon)):
-        apply_gps_coords(_glat, _glon, T)
-        st.rerun()
+    _fresh_fix = render_gps_component()  # True only on a NEW fix — no loops
+    if _fresh_fix:
+        _glat, _glon = try_gps()
+        if _glat is not None and _glon is not None:
+            apply_gps_coords(_glat, _glon, T)
+            st.rerun()
 
 # ---- Map-tap fallback: sets location with ZERO browser permission ----
 with st.expander(T["gps_map_title"]):
