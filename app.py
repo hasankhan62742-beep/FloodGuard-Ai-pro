@@ -87,6 +87,13 @@ STRINGS = {
         "check": "🔎 Check FloodGuard Risk",
         "gps": "📍 Use my location",
         "gps_ok": "Location detected!",
+        "gps_btn_label": "📍 Use My Location",
+        "gps_locating": "⏳ Locating… (tap Allow if your browser asks)",
+        "gps_denied_msg": "❌ Location is blocked for this site. Tap the 🔒 icon in the address bar → Permissions → Location → Allow, then tap the button again.",
+        "gps_unavailable_msg": "❌ Position unavailable — please turn ON location services (GPS) on your device and try again.",
+        "gps_timeout_msg": "⏰ Timed out — try again, or tap your place on the map below.",
+        "gps_nosupport_msg": "❌ This browser has no location support — please use the map below.",
+        "gps_found_msg": "✅ Location found!",
         "gps_tap_hint": "👇 Tap the 🎯 button for your current location, then tap Allow",
         "gps_map_title": "🗺️ Tap your location on the map (no permission needed)",
         "gps_map_hint": "Tap anywhere on the map to set your location — the exact village name will appear.",
@@ -105,6 +112,9 @@ STRINGS = {
         "gps_exact_unavailable": "Exact place name unavailable — showing nearest mapped village.",
         "nearest_village": "Nearest Village",
         "village_id": "Village ID",
+        "village_lbl": "Village",
+        "tehsil_lbl": "Tehsil",
+        "district_lbl": "District",
         "distance": "Distance",
         "coords": "Coordinates",
         "risk_model": "🌊 Flood Risk Model",
@@ -244,6 +254,13 @@ STRINGS = {
         "check": "🔎 فلڈ گارڈ رسک چیک کریں",
         "gps": "📍 میری لوکیشن استعمال کریں",
         "gps_ok": "لوکیشن مل گئی!",
+        "gps_btn_label": "📍 میری لوکیشن استعمال کریں",
+        "gps_locating": "⏳ لوکیشن معلوم کی جا رہی ہے… (اگر براؤزر پوچھے تو Allow دبائیں)",
+        "gps_denied_msg": "❌ اس سائٹ کے لیے لوکیشن بلاک ہے۔ ایڈریس بار میں 🔒 آئیکن دبائیں → Permissions → Location → Allow کریں، پھر بٹن دوبارہ دبائیں۔",
+        "gps_unavailable_msg": "❌ لوکیشن دستیاب نہیں — اپنے ڈیوائس کی لوکیشن سروس (GPS) آن کریں اور دوبارہ کوشش کریں۔",
+        "gps_timeout_msg": "⏰ وقت ختم ہو گیا — دوبارہ کوشش کریں یا نیچے نقشے پر اپنی جگہ tap کریں۔",
+        "gps_nosupport_msg": "❌ یہ براؤزر لوکیشن سپورٹ نہیں کرتا — نیچے نقشہ استعمال کریں۔",
+        "gps_found_msg": "✅ لوکیشن مل گئی!",
         "gps_tap_hint": "👇 اپنی موجودہ لوکیشن کے لیے 🎯 بٹن دبائیں، پھر Allow کریں",
         "gps_map_title": "🗺️ نقشے پر اپنی جگہ tap کریں (اجازت کی ضرورت نہیں)",
         "gps_map_hint": "لوکیشن سیٹ کرنے کے لیے نقشے پر کہیں بھی tap کریں — اصل گاؤں کا نام ظاہر ہوگا۔",
@@ -261,6 +278,9 @@ STRINGS = {
         "gps_exact_unavailable": "اصل جگہ کا نام دستیاب نہیں — قریبی درج گاؤں دکھایا جا رہا ہے۔",
         "nearest_village": "قریبی گاؤں",
         "village_id": "گاؤں کا نمبر",
+        "village_lbl": "گاؤں",
+        "tehsil_lbl": "تحصیل",
+        "district_lbl": "ضلع",
         "distance": "فاصلہ",
         "coords": "کوآرڈینیٹس",
         "risk_model": "🌊 سیلاب کے خطرے کا ماڈل",
@@ -1039,9 +1059,20 @@ def get_secrets_dict():
 def apply_gps_coords(glat, glon, T):
     """Apply a coordinate fix: fill the inputs, reverse-geocode the exact
     place name, and announce it. Callers guarantee this runs once per fix
-    (component path uses fresh-fix detection; map path uses gps_tapped)."""
+    (component path uses fresh-fix detection; map path uses gps_tapped).
+
+    NOTE (Streamlit gotcha): a number_input's displayed value comes from its
+    *widget state* (key 'lat_in'), NOT from the value= parameter, once the
+    widget exists. So we stash the new coords in '_set_lat'/'_set_lon' and
+    the location section copies them into the widget keys BEFORE creating
+    the inputs on the next run. Setting them here directly would raise
+    StreamlitAPIException (widget already instantiated)."""
     glat, glon = round(float(glat), 4), round(float(glon), 4)
     st.session_state["lat"], st.session_state["lon"] = glat, glon
+    # pending widget update — consumed before number_input creation
+    st.session_state["_set_lat"], st.session_state["_set_lon"] = glat, glon
+    # banner trigger: a fix was applied (independent of Nominatim success)
+    st.session_state["place_banner"] = True
     with st.spinner(T["loading"]):
         _place = geocode.reverse_geocode(glat, glon)
     if _place.get("status") == "ok":
@@ -1053,54 +1084,6 @@ def apply_gps_coords(glat, glon, T):
     else:
         st.session_state["gps_place"] = None
         st.success(T["gps_ok"])
-
-
-def render_gps_component():
-    """Render the browser geolocation component.
-
-    Returns True ONLY when a NEW fix arrived (coords differ from the last
-    seen fix) — this is what prevents the infinite rerun/geocode loop.
-    Stashes coords + accuracy in session state for try_gps().
-
-    NOTE: streamlit-geolocation renders its OWN 🎯 button — the browser
-    permission prompt fires only when THAT button is clicked, never on page
-    load and never from our own buttons. So this component just needs to be
-    visible with a clear label; the caller applies fresh fixes.
-    Requires the `streamlit-geolocation` package (see requirements.txt).
-    """
-    try:
-        from streamlit_geolocation import streamlit_geolocation
-
-        loc = streamlit_geolocation()
-        if isinstance(loc, dict):
-            # component versions differ: coords may be top-level or nested
-            coords = loc.get("coords") if isinstance(loc.get("coords"), dict) else loc
-            lat = coords.get("latitude")
-            lon = coords.get("longitude")
-            if lat is not None and lon is not None:
-                _key = (round(float(lat), 4), round(float(lon), 4))
-                if st.session_state.get("gps_seen") == _key:
-                    return False  # same fix as before — not new
-                st.session_state["gps_seen"] = _key
-                st.session_state["gps_lat"] = float(lat)
-                st.session_state["gps_lon"] = float(lon)
-                acc = coords.get("accuracy")
-                if acc is not None:
-                    try:
-                        st.session_state["gps_accuracy_m"] = round(float(acc), 0)
-                    except Exception:
-                        pass
-                return True
-    except Exception:
-        pass
-    return False
-
-
-def try_gps():
-    """Kept for compatibility — prefer render_gps_component()."""
-    if st.session_state.get("gps_lat") is not None:
-        return st.session_state["gps_lat"], st.session_state.get("gps_lon")
-    return None, None
 
 
 def risk_gauge(prob, T):
@@ -1297,6 +1280,13 @@ if model_kind() == "2026":
 # ======================================================================
 st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["location"]}</h3>',
             unsafe_allow_html=True)
+# Pending programmatic coordinate updates (from village search / map tap /
+# GPS button) must be written into the widget keys BEFORE the number_inputs
+# are created — afterwards Streamlit would ignore value= and refuse the write.
+if "_set_lat" in st.session_state:
+    st.session_state["lat_in"] = st.session_state.pop("_set_lat")
+if "_set_lon" in st.session_state:
+    st.session_state["lon_in"] = st.session_state.pop("_set_lon")
 c1, c2, c3 = st.columns([1, 1, 1])
 with c1:
     lat = st.number_input(T["latitude"], value=float(st.session_state["lat"]),
@@ -1305,17 +1295,26 @@ with c2:
     lon = st.number_input(T["longitude"], value=float(st.session_state["lon"]),
                           format="%.4f", step=0.0001, key="lon_in")
 with c3:
-    st.write("")
-    # The geolocation package renders its OWN 🎯 button — the browser prompt
-    # fires only from that button, so we label it clearly and auto-apply
-    # every fresh fix via apply_gps_coords().
-    st.caption(T["gps_tap_hint"])
-    _fresh_fix = render_gps_component()  # True only on a NEW fix — no loops
-    if _fresh_fix:
-        _glat, _glon = try_gps()
-        if _glat is not None and _glon is not None:
-            apply_gps_coords(_glat, _glon, T)
-            st.rerun()
+    # Our own GPS button component: big button, 15s timeout, permission
+    # guidance. Returns {'event':'fix','lat','lon','acc'} on a fresh fix.
+    try:
+        from gps_button_component import gps_button as _gps_btn
+        _gres = _gps_btn(T, key="gps_btn")
+    except Exception:
+        _gres = None
+        st.caption(T["gps_nosupport_msg"])
+    if isinstance(_gres, dict) and _gres.get("event") == "fix":
+        try:
+            _glat = float(_gres.get("lat")); _glon = float(_gres.get("lon"))
+            _sig = (round(_glat, 4), round(_glon, 4))
+            if st.session_state.get("gps_seen") != _sig:
+                st.session_state["gps_seen"] = _sig
+                if _gres.get("acc") is not None:
+                    st.session_state["gps_accuracy_m"] = float(_gres.get("acc"))
+                apply_gps_coords(_glat, _glon, T)
+                st.rerun()
+        except Exception:
+            pass
 
 # ---- Method 1 (easiest): find village by name — works for everyone ----
 st.markdown(f"**{T['village_search_title']}**")
@@ -1370,11 +1369,30 @@ except Exception:
 st.session_state["lat"], st.session_state["lon"] = lat, lon
 
 # persistent exact-place banner (survives reruns, unlike st.success above)
-_gp = st.session_state.get("gps_place")
-if _gp and _gp.get("status") == "ok":
-    _gacc = st.session_state.get("gps_accuracy_m")
-    _gacct = f" ({T['gps_accuracy']}: ±{_gacc:.0f} m)" if _gacc else ""
-    st.info(f"{T['gps_you_are_at']}: **{geocode.describe_place(_gp)}**{_gacct}")
+# Shows the nearest village from OUR 56k dataset (exact + instant) with
+# tehsil/district — triggered whenever a fix was applied.
+if st.session_state.get("place_banner"):
+    try:
+        _bv = find_nearest_village(lat, lon)
+        _brow = _bv.get("_row")
+
+        def _bc(col):
+            try:
+                _v = _brow[col] if _brow is not None and col in _brow.index else ""
+                return str(_v).strip() if pd.notna(_v) and str(_v).strip() != "nan" else ""
+            except Exception:
+                return ""
+
+        _bsub = ", ".join(p for p in
+                          [f"{T['tehsil_lbl']} {_bc('_tehsil')}" if _bc("_tehsil") else "",
+                           f"{T['district_lbl']} {_bc('_district')}" if _bc("_district") else ""]
+                          if p)
+        _gacc = st.session_state.get("gps_accuracy_m")
+        _gacct = f" ({T['gps_accuracy']}: ±{_gacc:.0f} m)" if _gacc else ""
+        st.info(f"{T['gps_you_are_at']}: **{_bv['name']}**" +
+                (f" ({_bsub})" if _bsub else "") + _gacct)
+    except Exception:
+        pass
 
 check = st.button(T["check"], type="primary", use_container_width=True,
                   key="check_btn")
@@ -1461,22 +1479,18 @@ if result:
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["risk_model"]}</h3>',
                 unsafe_allow_html=True)
     i1, i2, i3, i4 = st.columns(4)
-    _exact_disp = result.get("exact_name") or result["village"]
-    _dt = ", ".join(p for p in [result.get("village_district"),
-                                result.get("village_tehsil")] if p)
-    i1.metric(T["gps_you_are_at"].replace("📍 ", ""), _exact_disp)
-    i2.metric(T["village_id"], result["vid"])
-    i3.metric(T["distance"], f"{result['dist_km']:.2f} km")
+    # Village + Tehsil + District — all three, prominently (user requirement)
+    i1.metric(T["village_lbl"], result["village"])
+    i2.metric(T["tehsil_lbl"], result.get("village_tehsil") or "–")
+    i3.metric(T["district_lbl"], result.get("village_district") or "–")
     i4.metric(T["coords"], f"{result['lat']:.4f}, {result['lon']:.4f}")
+    _cap = f"{T['village_id']}: {result['vid']} · {T['distance']}: {result['dist_km']:.2f} km"
     if result.get("exact_name") and result["exact_name"] != result["village"]:
-        _nv = f"{T['nearest_village']}: {result['village']}"
-        st.caption(f"{_nv} ({_dt}) — {T['distance']}: {result['dist_km']:.2f} km"
-                   if _dt else f"{_nv} — {T['distance']}: {result['dist_km']:.2f} km")
+        st.caption(f"📍 {result['exact_name']} · {_cap}")
     elif not result.get("exact_name"):
-        st.caption(T["gps_exact_unavailable"])
+        st.caption(f"{T['gps_exact_unavailable']} · {_cap}")
     else:
-        _nv = f"{T['nearest_village']}: {result['village']}"
-        st.caption(f"{_nv} ({_dt})" if _dt else _nv)
+        st.caption(_cap)
 
     g1, g2 = st.columns([1, 1.2])
     with g1:
