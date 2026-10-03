@@ -64,6 +64,8 @@ def render_7day_chart(fc):
         return None
     dates = fc["dates"]
     labels = [d[5:] for d in dates]  # MM-DD
+    # NOTE: x-axis MUST be type="category" — otherwise plotly date-parses
+    # "10-03" as year 2010 / month 03 and shows "Mar 2010" etc.
     fig = go.Figure()
     fig.add_bar(
         x=labels, y=fc["precip_mm"], name="Rain (mm)",
@@ -78,8 +80,8 @@ def render_7day_chart(fc):
     ))
     fig.update_layout(
         title="7-day rainfall outlook",
-        xaxis_title="Date (MM-DD)",
-        yaxis={"title": "Rain (mm)", "side": "left"},
+        xaxis={"title": "Date (MM-DD)", "type": "category"},
+        yaxis={"title": "Rain (mm)", "side": "left", "rangemode": "tozero"},
         yaxis2={"title": "Probability (%)", "side": "right",
                 "overlaying": "y", "range": [0, 105]},
         legend={"orientation": "h", "y": 1.12},
