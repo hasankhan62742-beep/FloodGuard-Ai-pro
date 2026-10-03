@@ -17,7 +17,7 @@ Live-tested 2026-10-02 (see module docstring notes / PATCH_NOTES_ADVISORY.md).
 """
 
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -598,6 +598,41 @@ GIBS_LAYERS = {
     "true_color": "MODIS_Terra_CorrectedReflectance_TrueColor",
     "viirs_true_color": "VIIRS_SNPP_CorrectedReflectance_TrueColor",
 }
+
+
+def fetch_satellite_image(lat, lon, date_str, max_lookback_days=7,
+                          min_bytes=20000):
+    """Fetch a real satellite image, stepping back over cloudy/missing days.
+
+    GIBS true-colour layers lag ~1-2 days and some days have no coverage;
+    those return tiny blank images. This tries date_str, then each previous
+    day up to max_lookback_days, and returns the first image bigger than
+    min_bytes.
+
+    Returns dict: {'status':'ok','image_bytes':b...,'date':'YYYY-MM-DD',
+                    'url':...} or {'status':'unavailable','reason':...}.
+    Never raises.
+    """
+    try:
+        import requests as _rq
+        base = datetime.strptime(date_str, "%Y-%m-%d").date()
+        for back in range(max_lookback_days + 1):
+            d = (base - timedelta(days=back)).isoformat()
+            url = satellite_image_url(lat, lon, d)
+            try:
+                r = _rq.get(url, timeout=30)
+                if (r.status_code == 200
+                        and "jpeg" in r.headers.get("Content-Type", "")
+                        and len(r.content) >= min_bytes):
+                    return {"status": "ok", "image_bytes": r.content,
+                            "date": d, "url": url,
+                            "source": "NASA GIBS MODIS Terra (free, no key)"}
+            except Exception:
+                continue
+        return {"status": "unavailable",
+                "reason": "no usable image in lookback window"}
+    except Exception as e:
+        return {"status": "unavailable", "reason": str(e)[:100]}
 
 
 def satellite_image_url(lat, lon, date_str, half_deg=0.25, width=1024, height=1024,

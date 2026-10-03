@@ -43,6 +43,7 @@ import advisory  # soil, crop advice, river levels, satellite (no streamlit dep)
 
 import dashboard   # district risk dashboard (no streamlit dep at import)
 import forecast    # 7-day rain forecast (no streamlit dep at import)
+import geocode     # reverse geocoding — exact village/town name (no streamlit dep)
 import official    # NDMA/PDMA official alerts (no streamlit dep)
 import reports     # community flood reports via Telegram (no streamlit dep)
 import voice       # Urdu voice readout via gTTS (no streamlit dep at import)
@@ -86,6 +87,9 @@ STRINGS = {
         "gps": "📍 Use my location",
         "gps_ok": "Location detected!",
         "gps_fail": "GPS not available in this environment — please enter coordinates manually.",
+        "gps_you_are_at": "📍 You are at",
+        "gps_accuracy": "GPS accuracy",
+        "gps_exact_unavailable": "Exact place name unavailable — showing nearest mapped village.",
         "nearest_village": "Nearest Village",
         "village_id": "Village ID",
         "distance": "Distance",
@@ -101,6 +105,10 @@ STRINGS = {
         "temp": "Temperature", "humidity": "Humidity", "rain": "Rain",
         "wind": "Wind", "rain24": "Next 24h Rain", "rain24prob": "Next 24h Rain Prob.",
         "wind72": "72h Max Wind", "gust72": "72h Max Gust",
+        "soil_moisture": "💧 Soil Moisture",
+        "sm_dry": "Dry", "sm_moist": "Moist", "sm_wet": "Wet",
+        "sm_saturated": "Saturated ⚠️",
+        "sm_note": "Saturated soil absorbs less rain — flood risk rises.",
         "live_now": "🔴 LIVE RIGHT NOW",
         "rain_now": "Raining now", "rain_next3h": "Next 3h rain",
         "updated": "Updated",
@@ -144,6 +152,8 @@ STRINGS = {
         "river_ffd_unavailable": "FFD bulletin unavailable — check ffd.pmd.gov.pk directly.",
         "sat_title": "🛰️ Satellite View",
         "sat_date": "Image date",
+        "sat_fallback": "Closest available image shown",
+        "sat_unavailable": "Satellite image unavailable right now.",
         "village": "Village",
         "probability": "Probability",
         "weather_fail": "Live weather unavailable right now.",
@@ -173,6 +183,7 @@ STRINGS = {
         "share_download": "⬇️ Download shareable image",
         "voice_title": "🔊 Listen to Result (Urdu)",
         "voice_play": "🔊 Play Urdu result",
+        "voice_download": "⬇️ Download voice (MP3)",
         "voice_unavailable": "Urdu voice unavailable right now.",
         "alerts_title": "📲 Flood Alerts",
         "alerts_desc": "Get a WhatsApp or Email alert when flood risk at your location reaches 60%+. Checked automatically every morning (06:00 PKT).",
@@ -221,6 +232,9 @@ STRINGS = {
         "gps": "📍 میری لوکیشن استعمال کریں",
         "gps_ok": "لوکیشن مل گئی!",
         "gps_fail": "اس ماحول میں GPS دستیاب نہیں — براہ کرم کوآرڈینیٹس خود درج کریں۔",
+        "gps_you_are_at": "📍 آپ اس وقت یہاں ہیں",
+        "gps_accuracy": "GPS درستگی",
+        "gps_exact_unavailable": "اصل جگہ کا نام دستیاب نہیں — قریبی درج گاؤں دکھایا جا رہا ہے۔",
         "nearest_village": "قریبی گاؤں",
         "village_id": "گاؤں کا نمبر",
         "distance": "فاصلہ",
@@ -237,6 +251,10 @@ STRINGS = {
         "wind": "ہوا کی رفتار", "rain24": "اگلے 24 گھنٹے میں بارش",
         "rain24prob": "اگلے 24 گھنٹے میں بارش کا امکان",
         "wind72": "72 گھنٹے میں زیادہ سے زیادہ ہوا", "gust72": "72 گھنٹے میں زیادہ سے زیادہ جھونکا",
+        "soil_moisture": "💧 مٹی میں نمی",
+        "sm_dry": "خشک", "sm_moist": "نم", "sm_wet": "گیلا",
+        "sm_saturated": "پانی سے بھرا ⚠️",
+        "sm_note": "بھری ہوئی مٹی کم بارش جذب کرتی ہے — سیلاب کا خطرہ بڑھتا ہے۔",
         "live_now": "🔴 ابھی لائیو",
         "rain_now": "اس وقت بارش", "rain_next3h": "اگلے 3 گھنٹے میں بارش",
         "updated": "اپ ڈیٹ ہوا",
@@ -281,6 +299,8 @@ STRINGS = {
         "river_ffd_unavailable": "ایف ایف ڈی بلیٹن دستیاب نہیں — ffd.pmd.gov.pk خود دیکھیں۔",
         "sat_title": "🛰️ سیٹلائٹ منظر",
         "sat_date": "تصویر کی تاریخ",
+        "sat_fallback": "قریب ترین دستیاب تصویر دکھائی جا رہی ہے",
+        "sat_unavailable": "سیٹلائٹ تصویر اس وقت دستیاب نہیں۔",
         "village": "گاؤں",
         "probability": "امکان",
         "weather_fail": "لائیو موسم اس وقت دستیاب نہیں۔",
@@ -310,6 +330,7 @@ STRINGS = {
         "share_download": "⬇️ شیئر تصویر ڈاؤن لوڈ کریں",
         "voice_title": "🔊 نتیجہ سنیں (اردو)",
         "voice_play": "🔊 اردو نتیجہ چلائیں",
+        "voice_download": "⬇️ آواز ڈاؤن لوڈ کریں (MP3)",
         "voice_unavailable": "اردو آواز اس وقت دستیاب نہیں۔",
         "alerts_title": "📲 سیلاب الرٹس",
         "alerts_desc": "جب آپ کے علاقے میں سیلاب کا خطرہ 60%+ ہو تو WhatsApp یا ای میل الرٹ حاصل کریں۔ روز صبح 06:00 بجے خودکار چیک ہوتا ہے۔",
@@ -723,7 +744,8 @@ def fetch_weather(lat, lon):
         "https://api.open-meteo.com/v1/forecast"
         f"?latitude={lat}&longitude={lon}"
         "&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m"
-        "&hourly=precipitation,precipitation_probability,wind_speed_10m,wind_gusts_10m"
+        "&hourly=precipitation,precipitation_probability,wind_speed_10m,wind_gusts_10m,"
+        "soil_temperature_6cm,soil_moisture_3_9cm"
         "&forecast_days=3&timezone=auto"
     )
     r = requests.get(url, timeout=12)
@@ -754,6 +776,7 @@ def parse_weather(data):
         "rain24": None, "rain24prob": None,
         "wind72": None, "gust72": None,
         "rain_next3h": None,
+        "soil_moisture": None, "soil_temp": None,
     }
     try:
         cur_t = cur.get("time", "")
@@ -770,9 +793,30 @@ def parse_weather(data):
         out["rain_next3h"] = round(sum(x for x in precip[:3] if x is not None), 1)
         out["wind72"] = round(max((x for x in wind if x is not None), default=0), 1)
         out["gust72"] = round(max((x for x in gust if x is not None), default=0), 1)
+        # soil state at current hour (fraction m3/m3 -> %)
+        _sm = (hourly.get("soil_moisture_3_9cm", []) or [None])
+        _st = (hourly.get("soil_temperature_6cm", []) or [None])
+        _smi = min(idx, len(_sm) - 1)
+        if _smi >= 0 and _sm[_smi] is not None:
+            out["soil_moisture"] = round(float(_sm[_smi]) * 100, 1)
+        if _smi >= 0 and _st[_smi] is not None:
+            out["soil_temp"] = round(float(_st[_smi]), 1)
     except Exception:
         pass
     return out
+
+
+def soil_moisture_verdict(pct, T):
+    """Saturation verdict for flood relevance. Returns (label, is_bad)."""
+    if pct is None:
+        return ("–", False)
+    if pct < 15:
+        return (T["sm_dry"], False)
+    if pct < 30:
+        return (T["sm_moist"], False)
+    if pct < 42:
+        return (T["sm_wet"], False)
+    return (T["sm_saturated"], True)
 
 
 @st.cache_data
@@ -926,11 +970,19 @@ def render_gps_component():
 
         loc = streamlit_geolocation()
         if isinstance(loc, dict):
-            lat = loc.get("latitude")
-            lon = loc.get("longitude")
+            # component versions differ: coords may be top-level or nested
+            coords = loc.get("coords") if isinstance(loc.get("coords"), dict) else loc
+            lat = coords.get("latitude")
+            lon = coords.get("longitude")
             if lat is not None and lon is not None:
                 st.session_state["gps_lat"] = float(lat)
                 st.session_state["gps_lon"] = float(lon)
+                acc = coords.get("accuracy")
+                if acc is not None:
+                    try:
+                        st.session_state["gps_accuracy_m"] = round(float(acc), 0)
+                    except Exception:
+                        pass
                 return True
     except Exception:
         pass
@@ -1153,7 +1205,18 @@ with c3:
         glat, glon = try_gps()
         if glat is not None and glon is not None:
             st.session_state["lat"], st.session_state["lon"] = round(glat, 4), round(glon, 4)
-            st.success(T["gps_ok"])
+            # exact place name via free reverse geocoding (OSM Nominatim)
+            with st.spinner(T["loading"]):
+                _place = geocode.reverse_geocode(glat, glon)
+            if _place.get("status") == "ok":
+                st.session_state["gps_place"] = _place
+                _pname = geocode.describe_place(_place)
+                _acc = st.session_state.get("gps_accuracy_m")
+                _acc_txt = f" ({T['gps_accuracy']}: ±{_acc:.0f} m)" if _acc else ""
+                st.success(f"{T['gps_ok']} {T['gps_you_are_at']}: **{_pname}**{_acc_txt}")
+            else:
+                st.session_state["gps_place"] = None
+                st.success(T["gps_ok"])
             st.rerun()
         elif gps_ready:
             st.info(T["gps_ok"])
@@ -1161,6 +1224,13 @@ with c3:
         else:
             st.warning(T["gps_fail"])
 st.session_state["lat"], st.session_state["lon"] = lat, lon
+
+# persistent exact-place banner (survives reruns, unlike st.success above)
+_gp = st.session_state.get("gps_place")
+if _gp and _gp.get("status") == "ok":
+    _gacc = st.session_state.get("gps_accuracy_m")
+    _gacct = f" ({T['gps_accuracy']}: ±{_gacc:.0f} m)" if _gacc else ""
+    st.info(f"{T['gps_you_are_at']}: **{geocode.describe_place(_gp)}**{_gacct}")
 
 check = st.button(T["check"], type="primary", use_container_width=True,
                   key="check_btn")
@@ -1174,11 +1244,21 @@ if check:
     village = find_nearest_village(lat, lon)
     prob = predict_probability(lat, lon, model)
     band, _ = risk_band(prob, T)
+    # exact place name: prefer live reverse-geocode of the checked coords
+    # (falls back to the GPS-fix name, then the nearest dataset village)
+    _exact = st.session_state.get("gps_place")
+    if not (_exact and _exact.get("status") == "ok"
+            and abs(_exact.get("lat", 0) - lat) < 0.02
+            and abs(_exact.get("lon", 0) - lon) < 0.02):
+        _rg = geocode.reverse_geocode(lat, lon)
+        _exact = _rg if _rg.get("status") == "ok" else None
+    exact_name = geocode.describe_place(_exact) if _exact else ""
     result = {
         "lat": lat, "lon": lon,
         "village": village["name"], "vid": village["vid"],
         "vlat": village["lat"], "vlon": village["lon"],
         "dist_km": village["dist_km"],
+        "exact_name": exact_name,
         "prob": prob, "band": band,
         "prediction": prediction_text(prob, T),
         "prediction_en": prediction_text(prob, STRINGS["en"]),
@@ -1228,10 +1308,18 @@ if result:
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["risk_model"]}</h3>',
                 unsafe_allow_html=True)
     i1, i2, i3, i4 = st.columns(4)
-    i1.metric(T["nearest_village"], result["village"])
+    _exact_disp = result.get("exact_name") or result["village"]
+    i1.metric(T["gps_you_are_at"].replace("📍 ", ""), _exact_disp)
     i2.metric(T["village_id"], result["vid"])
     i3.metric(T["distance"], f"{result['dist_km']:.2f} km")
     i4.metric(T["coords"], f"{result['lat']:.4f}, {result['lon']:.4f}")
+    if result.get("exact_name") and result["exact_name"] != result["village"]:
+        st.caption(f"{T['nearest_village']}: {result['village']} "
+                   f"({T['distance']}: {result['dist_km']:.2f} km)")
+    elif not result.get("exact_name"):
+        st.caption(T["gps_exact_unavailable"])
+    else:
+        st.caption(f"{T['nearest_village']}: {result['village']}")
 
     g1, g2 = st.columns([1, 1.2])
     with g1:
@@ -1289,13 +1377,28 @@ if result:
 
         st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["voice_title"]}</h3>',
                     unsafe_allow_html=True)
-        if st.button(T["voice_play"], key="voice_btn"):
-            with st.spinner(T["loading"]):
-                _speech = voice.build_result_speech(result["village"],
-                                                    result["prob"], _band_en)
-                _audio = voice.speak_urdu(_speech)
-            if _audio is not None:
-                st.audio(_audio, format="audio/mp3")
+        # audio bytes live in session_state so the player survives reruns
+        # (a bare st.button gate made the player vanish mid-playback)
+        _vkey = f"voice_{result['vid']}_{int(result['prob'])}"
+        _vdlkey = _vkey + "_dl"
+        if _vkey not in st.session_state:
+            if st.button(T["voice_play"], key="voice_btn"):
+                with st.spinner(T["loading"]):
+                    _speech = voice.build_result_speech(result["village"],
+                                                        result["prob"], _band_en)
+                    _audio = voice.speak_urdu(_speech)
+                st.session_state[_vkey] = (_audio.getvalue()
+                                          if _audio is not None else None)
+                st.rerun()
+        _vbytes = st.session_state.get(_vkey)
+        if _vbytes:
+            st.audio(_vbytes, format="audio/mp3")
+            st.download_button(
+                label=T["voice_download"], data=_vbytes,
+                file_name=f"floodguard_voice_{result['vid']}.mp3",
+                mime="audio/mp3", key=_vdlkey)
+        elif _vkey in st.session_state:
+            st.info(T["voice_unavailable"])
         st.markdown("</div>", unsafe_allow_html=True)
     except Exception:
         pass  # gTTS missing -> hide voice section silently
@@ -1326,6 +1429,13 @@ if result:
         w6.metric(T["rain24prob"], f"{w['rain24prob']} %" if w["rain24prob"] is not None else "–")
         w7.metric(T["wind72"], f"{w['wind72']} km/h")
         w8.metric(T["gust72"], f"{w['gust72']} km/h")
+        _smv, _smbad = soil_moisture_verdict(w.get("soil_moisture"), T)
+        w9, w10 = st.columns(2)
+        _smtxt = f"{w['soil_moisture']} %" if w.get("soil_moisture") is not None else "–"
+        w9.metric(T["soil_moisture"], _smtxt,
+                  delta=_smv if w.get("soil_moisture") is not None else None)
+        if _smbad:
+            w10.warning(f"⚠️ {T['sm_note']}")
     else:
         st.warning(T["weather_fail"])
     st.markdown("</div>", unsafe_allow_html=True)
@@ -1394,17 +1504,21 @@ if result:
     st.markdown(f'<div class="fg-card"><h3 style="margin-top:0">{T["sat_title"]}</h3>',
                 unsafe_allow_html=True)
     _today = datetime.now().date()
-    sat_date = st.date_input(T["sat_date"], value=_today,
+    _sat_default = _today - timedelta(days=3)  # GIBS imagery lags ~2 days
+    sat_date = st.date_input(T["sat_date"], value=_sat_default,
                              min_value=_today - timedelta(days=30),
                              max_value=_today, key="sat_date")
-    try:
-        sat_url = advisory.satellite_image_url(result["lat"], result["lon"],
-                                               sat_date.isoformat())
-        st.image(sat_url,
-                 caption=f"NASA MODIS Terra true-colour — {sat_date.isoformat()}",
+    with st.spinner(T["loading"]):
+        _sat = advisory.fetch_satellite_image(result["lat"], result["lon"],
+                                              sat_date.isoformat())
+    if _sat.get("status") == "ok":
+        st.image(_sat["image_bytes"],
+                 caption=f"NASA MODIS Terra true-colour — {_sat['date']}",
                  use_container_width=True)
-    except Exception as e:
-        st.warning(f"Satellite image unavailable: {e}")
+        if _sat["date"] != sat_date.isoformat():
+            st.caption(f"ℹ️ {T['sat_fallback']}: {_sat['date']}")
+    else:
+        st.warning(T["sat_unavailable"])
     st.caption("Source: NASA GIBS (free, no key)")
     st.markdown("</div>", unsafe_allow_html=True)
 
