@@ -87,6 +87,9 @@ STRINGS = {
         "check": "🔎 Check FloodGuard Risk",
         "gps": "📍 Use my location",
         "gps_ok": "Location detected!",
+        "gps_tap_hint": "👇 Tap the 🎯 button for your current location, then tap Allow",
+        "gps_map_title": "🗺️ Or tap your location on the map (no permission needed)",
+        "gps_map_hint": "Tap anywhere on the map to set your location — the exact village name will appear.",
         "gps_fail": "GPS not available in this environment — please enter coordinates manually.",
         "gps_waiting": "📡 Waiting for browser location… please tap Allow when your browser asks.",
         "gps_denied_hint": ("Location is blocked or unavailable. Tap the 📍/🔒 icon in your "
@@ -236,6 +239,9 @@ STRINGS = {
         "check": "🔎 فلڈ گارڈ رسک چیک کریں",
         "gps": "📍 میری لوکیشن استعمال کریں",
         "gps_ok": "لوکیشن مل گئی!",
+        "gps_tap_hint": "👇 اپنی موجودہ لوکیشن کے لیے 🎯 بٹن دبائیں، پھر Allow کریں",
+        "gps_map_title": "🗺️ یا نقشے پر اپنی جگہ tap کریں (اجازت کی ضرورت نہیں)",
+        "gps_map_hint": "لوکیشن سیٹ کرنے کے لیے نقشے پر کہیں بھی tap کریں — اصل گاؤں کا نام ظاہر ہوگا۔",
         "gps_fail": "اس ماحول میں GPS دستیاب نہیں — براہ کرم کوآرڈینیٹس خود درج کریں۔",
         "gps_waiting": "📡 براؤزر کی لوکیشن کا انتظار ہے… براہ کرم پوچھے جانے پر Allow دبائیں۔",
         "gps_denied_hint": ("لوکیشن بلاک یا دستیاب نہیں۔ براؤزر کے ایڈریس بار میں 📍/🔒 آئیکن دبائیں ← "
@@ -993,12 +999,34 @@ def get_secrets_dict():
         return None
 
 
+def apply_gps_coords(glat, glon, T):
+    """Apply a fresh coordinate fix: fill the inputs, reverse-geocode the
+    exact place name, and announce it. Guarded by session_state['gps_applied']
+    so the same fix is never processed twice."""
+    glat, glon = round(float(glat), 4), round(float(glon), 4)
+    st.session_state["gps_applied"] = (glat, glon)
+    st.session_state["lat"], st.session_state["lon"] = glat, glon
+    with st.spinner(T["loading"]):
+        _place = geocode.reverse_geocode(glat, glon)
+    if _place.get("status") == "ok":
+        st.session_state["gps_place"] = _place
+        _pname = geocode.describe_place(_place)
+        _acc = st.session_state.get("gps_accuracy_m")
+        _acc_txt = f" ({T['gps_accuracy']}: ±{_acc:.0f} m)" if _acc else ""
+        st.success(f"{T['gps_ok']} {T['gps_you_are_at']}: **{_pname}**{_acc_txt}")
+    else:
+        st.session_state["gps_place"] = None
+        st.success(T["gps_ok"])
+
+
 def render_gps_component():
     """Render the browser geolocation component and stash coords in session state.
 
-    Returns True when a fresh browser location is available. Never raises —
-    the UI shows a graceful fallback message instead. Requires the
-    `streamlit-geolocation` package (see requirements.txt).
+    NOTE: streamlit-geolocation renders its OWN 🎯 button — the browser
+    permission prompt fires only when THAT button is clicked, never on page
+    load and never from our own buttons. So this component just needs to be
+    visible with a clear label; apply_gps_coords() picks up fresh fixes.
+    Requires the `streamlit-geolocation` package (see requirements.txt).
     """
     try:
         from streamlit_geolocation import streamlit_geolocation
@@ -1234,42 +1262,40 @@ with c2:
                           format="%.4f", step=0.0001, key="lon_in")
 with c3:
     st.write("")
-    st.write("")
-    # The browser geolocation component is mounted ONLY after the user clicks
-    # the button, so the permission prompt is tied to their gesture and can
-    # be re-triggered (previously it fired once at page load and the button
-    # could never bring it back).
-    if st.button(T["gps"], key="gps_btn"):
-        st.session_state["gps_requested"] = True
-        st.session_state["gps_requested_at"] = time.time()
-        st.session_state["gps_lat"] = None
-        st.session_state["gps_lon"] = None
+    # The geolocation package renders its OWN 🎯 button — the browser prompt
+    # fires only from that button, so we label it clearly and auto-apply
+    # every fresh fix via apply_gps_coords().
+    st.caption(T["gps_tap_hint"])
+    render_gps_component()
+    _glat, _glon = try_gps()
+    _applied = st.session_state.get("gps_applied")
+    if (_glat is not None and _glon is not None
+            and tuple(_applied or (None, None)) != (_glat, _glon)):
+        apply_gps_coords(_glat, _glon, T)
         st.rerun()
-    if st.session_state.get("gps_requested"):
-        _gps_ok = render_gps_component()  # mounted now -> browser prompts
-        glat, glon = try_gps()
-        if glat is not None and glon is not None:
-            st.session_state["lat"], st.session_state["lon"] = round(glat, 4), round(glon, 4)
-            # exact place name via free reverse geocoding (OSM Nominatim)
-            with st.spinner(T["loading"]):
-                _place = geocode.reverse_geocode(glat, glon)
-            if _place.get("status") == "ok":
-                st.session_state["gps_place"] = _place
-                _pname = geocode.describe_place(_place)
-                _acc = st.session_state.get("gps_accuracy_m")
-                _acc_txt = f" ({T['gps_accuracy']}: ±{_acc:.0f} m)" if _acc else ""
-                st.success(f"{T['gps_ok']} {T['gps_you_are_at']}: **{_pname}**{_acc_txt}")
-            else:
-                st.session_state["gps_place"] = None
-                st.success(T["gps_ok"])
-            st.session_state["gps_requested"] = False  # unmount component
-            st.rerun()
-        else:
-            _wait = time.time() - float(st.session_state.get("gps_requested_at", 0))
-            if _wait > 12:
-                st.warning(T["gps_denied_hint"])
-            else:
-                st.info(T["gps_waiting"])
+
+# ---- Map-tap fallback: sets location with ZERO browser permission ----
+with st.expander(T["gps_map_title"]):
+    st.caption(T["gps_map_hint"])
+    try:
+        from streamlit_folium import st_folium
+        import folium as _fl
+
+        _clat, _clon = float(st.session_state["lat"]), float(st.session_state["lon"])
+        _pick = _fl.Map(location=[_clat, _clon], zoom_start=11,
+                        tiles="OpenStreetMap")
+        _fl.Marker([_clat, _clon], tooltip=T["gps_tap_hint"]).add_to(_pick)
+        _tapped = st_folium(_pick, height=300, width=700, key="gps_pick_map")
+        _lc = (_tapped or {}).get("last_clicked")
+        if _lc:
+            _tlat, _tlon = round(float(_lc["lat"]), 4), round(float(_lc["lng"]), 4)
+            _last_tap = st.session_state.get("gps_tapped")
+            if tuple(_last_tap or (None, None)) != (_tlat, _tlon):
+                st.session_state["gps_tapped"] = (_tlat, _tlon)
+                apply_gps_coords(_tlat, _tlon, T)
+                st.rerun()
+    except Exception:
+        pass
 st.session_state["lat"], st.session_state["lon"] = lat, lon
 
 # persistent exact-place banner (survives reruns, unlike st.success above)
